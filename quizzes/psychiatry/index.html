@@ -43,7 +43,7 @@
         .result-opt { padding: 8px; border-radius: 8px; margin: 5px 0; font-size: 0.9rem; }
         .correct-opt { background: #38a169; color: white; font-weight: bold; }
         .incorrect-opt { background: #e53e3e; color: white; }
-
+        
         /* Media Queries برای موبایل */
         @media (max-width: 600px) {
             body { padding: 0; }
@@ -99,7 +99,7 @@
             document.getElementById('q-number').innerText = 'سوال ' + (currentIdx + 1) + ' از ' + quizData.length;
             document.getElementById('q-content').innerText = q.q;
             document.getElementById('pb').style.width = ((currentIdx + 1) / quizData.length * 100) + '%';
-
+            
             const container = document.getElementById('options-container');
             container.innerHTML = '';
             q.options.forEach((opt, i) => {
@@ -133,4 +133,58 @@
             grid.innerHTML = '';
             quizData.forEach((_, i) => {
                 const dot = document.createElement('div');
-                dot.clas
+                dot.className = 'q-dot';
+                if (userAnswers[i] !== null) dot.classList.add('answered');
+                if (i === currentIdx) dot.classList.add('current');
+                dot.innerText = i + 1;
+                dot.onclick = () => { currentIdx = i; showQuestion(); toggleList(); };
+                grid.appendChild(dot);
+            });
+        }
+
+        function showResults() {
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+            let correct = userAnswers.reduce((acc, ans, i) => acc + (ans === quizData[i].ans ? 1 : 0), 0);
+            document.getElementById('c-count').innerText = correct;
+            document.getElementById('w-count').innerText = quizData.length - correct;
+
+            new Chart(document.getElementById('myChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['صحیح', 'غلط'],
+                    datasets: [{ data: [correct, quizData.length - correct], backgroundColor: ['#38a169', '#e53e3e'], borderWeight: 0 }]
+                },
+                options: { cutout: '70%', plugins: { legend: { display: false } } }
+            });
+
+            const detailedContainer = document.getElementById('detailed-results');
+            detailedContainer.innerHTML = '<h3 style="margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px;">بررسی سوالات:</h3>';
+
+            quizData.forEach((q, i) => {
+                const userAns = userAnswers[i];
+                const isCorrect = userAns === q.ans;
+                const item = document.createElement('div');
+                item.className = 'result-item ' + (isCorrect ? 'correct-bg' : 'incorrect-bg');
+
+                let optionsHtml = '';
+                q.options.forEach((opt, idx) => {
+                    const optNum = idx + 1;
+                    let optClass = 'result-opt';
+                    if (optNum === q.ans) optClass += ' correct-opt';
+                    else if (optNum === userAns) optClass += ' incorrect-opt';
+
+                    optionsHtml += `<div class="${optClass}">${optNum}. ${opt} ${optNum === userAns ? ' (پاسخ شما)' : ''} ${optNum === q.ans ? ' (پاسخ صحیح)' : ''}</div>`;
+                });
+
+                item.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 10px;">سوال ${i + 1}: ${q.q}</div>
+                    <div class="result-options">${optionsHtml}</div>
+                `;
+                detailedContainer.appendChild(item);
+            });
+        }
+        showQuestion();
+    </script>
+</body>
+</html>
