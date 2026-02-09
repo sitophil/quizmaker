@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <title>مبدل آزمون ریسپانسیو و مدرن</title>
     <style>
-        @import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
+        @import url('https://fonts.googleapis.com/css2?family=Playpen+Sans+Arabic:wght@100..800&display=swap');
         :root { --primary: #6c5ce7; --bg: #f0f3f7; }
-        body { font-family: Vazirmatn, sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        body { font-family: 'Playpen Sans Arabic', cursive; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
         .converter-card { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 100%; }
         h2 { color: var(--primary); margin-bottom: 25px; }
         .file-upload { border: 2px dashed #cbd5e0; padding: 25px; border-radius: 15px; margin-bottom: 20px; position: relative; transition: 0.3s; }
         .file-upload:hover { border-color: var(--primary); background: #f8faff; }
         input[type="file"] { position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0; cursor: pointer; }
-        .btn { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; font-family: Vazirmatn; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; }
+        .btn { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; font-family: 'Playpen Sans Arabic', cursive; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -53,9 +53,9 @@ function generateHTML(data) {
     <title>آزمون آنلاین ریسپانسیو</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>
     <style>
-        @import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
+        @import url('https://fonts.googleapis.com/css2?family=Playpen+Sans+Arabic:wght@100..800&display=swap');
         :root { --p: #6c5ce7; --bg: #f8f9fd; }
-        body { font-family: Vazirmatn, sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 15px; box-sizing: border-box; }
+        body { font-family: 'Playpen Sans Arabic', cursive; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 15px; box-sizing: border-box; }
         .quiz-card { background: white; width: 100%; max-width: 600px; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin-top: 20px; position: relative; overflow: hidden; }
         .progress-bar { position: absolute; top: 0; left: 0; height: 5px; background: var(--p); transition: 0.4s; }
         .q-text { font-size: 1.2rem; font-weight: bold; margin: 20px 0; line-height: 1.6; }
@@ -63,12 +63,18 @@ function generateHTML(data) {
         .opt:hover { background: #f4f2ff; border-color: var(--p); }
         .opt.selected { background: var(--p); color: white; border-color: var(--p); }
         .nav-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 25px; }
-        .n-btn { background: var(--p); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-family: Vazirmatn; font-size: 1rem; }
+        .n-btn { background: var(--p); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-family: 'Playpen Sans Arabic', cursive; font-size: 1rem; }
         .n-btn:disabled { background: #e2e8f0; color: #a0aec0; cursor: not-allowed; }
         #result-screen { display: none; text-align: center; }
         .chart-container { width: 100%; max-width: 250px; margin: 0 auto; }
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
         .stat-box { padding: 15px; border-radius: 12px; background: #f7fafc; border: 1px solid #edf2f7; }
+        .result-item { padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #edf2f7; }
+        .correct-bg { background: #f0fff4; border-color: #c6f6d5; }
+        .incorrect-bg { background: #fff5f5; border-color: #fed7d7; }
+        .result-opt { padding: 8px; border-radius: 8px; margin: 5px 0; font-size: 0.9rem; }
+        .correct-opt { background: #38a169; color: white; font-weight: bold; }
+        .incorrect-opt { background: #e53e3e; color: white; }
         
         /* Media Queries برای موبایل‌های خیلی کوچک */
         @media (max-width: 400px) {
@@ -98,6 +104,7 @@ function generateHTML(data) {
                 <div class="stat-box">صحیح: <b id="c-count" style="color:#38a169"></b></div>
                 <div class="stat-box">غلط: <b id="w-count" style="color:#e53e3e"></b></div>
             </div>
+            <div id="detailed-results" style="margin-top: 25px; text-align: right;"></div>
             <button class="n-btn" style="margin-top:20px; width:100%" onclick="location.reload()">تکرار آزمون</button>
         </div>
     </div>
@@ -148,6 +155,32 @@ function generateHTML(data) {
                     datasets: [{ data: [correct, quizData.length - correct], backgroundColor: ['#38a169', '#e53e3e'], borderWeight: 0 }]
                 },
                 options: { cutout: '70%', plugins: { legend: { display: false } } }
+            });
+
+            const detailedContainer = document.getElementById('detailed-results');
+            detailedContainer.innerHTML = '<h3 style="margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px;">بررسی سوالات:</h3>';
+
+            quizData.forEach((q, i) => {
+                const userAns = userAnswers[i];
+                const isCorrect = userAns === q.ans;
+                const item = document.createElement('div');
+                item.className = 'result-item ' + (isCorrect ? 'correct-bg' : 'incorrect-bg');
+
+                let optionsHtml = '';
+                q.options.forEach((opt, idx) => {
+                    const optNum = idx + 1;
+                    let optClass = 'result-opt';
+                    if (optNum === q.ans) optClass += ' correct-opt';
+                    else if (optNum === userAns) optClass += ' incorrect-opt';
+
+                    optionsHtml += \`<div class="\${optClass}">\${optNum}. \${opt} \${optNum === userAns ? ' (پاسخ شما)' : ''} \${optNum === q.ans ? ' (پاسخ صحیح)' : ''}<\/div>\`;
+                });
+
+                item.innerHTML = \`
+                    <div style="font-weight: bold; margin-bottom: 10px;">سوال \${i + 1}: \${q.q}<\/div>
+                    <div class="result-options">\${optionsHtml}<\/div>
+                \`;
+                detailedContainer.appendChild(item);
             });
         }
         showQuestion();
