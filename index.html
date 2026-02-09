@@ -62,10 +62,24 @@ function generateHTML(data) {
         .opt { display: flex; align-items: center; padding: 14px; border: 2px solid #edf2f7; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; font-size: 0.95rem; }
         .opt:hover { background: #f4f2ff; border-color: var(--p); }
         .opt.selected { background: var(--p); color: white; border-color: var(--p); }
-        .nav-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 25px; }
-        .n-btn { background: var(--p); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-family: 'Playpen Sans Arabic', cursive; font-size: 1rem; }
+        .nav-btns {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 600px; background: white; padding: 15px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.05); display: flex; gap: 10px; box-sizing: border-box; z-index: 100;
+        }
+        .n-btn { flex: 1; background: var(--p); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-family: 'Playpen Sans Arabic', cursive; font-size: 1rem; }
         .n-btn:disabled { background: #e2e8f0; color: #a0aec0; cursor: not-allowed; }
-        #result-screen { display: none; text-align: center; }
+        .list-btn { width: 50px; flex: none !important; background: #edf2f7 !important; color: var(--p) !important; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: flex-end; z-index: 1000; }
+        .modal-content { background: white; width: 100%; max-width: 600px; border-radius: 20px 20px 0 0; padding: 25px; max-height: 80vh; overflow-y: auto; box-sizing: border-box; }
+        .q-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 10px; margin-top: 20px; }
+        .q-dot { aspect-ratio: 1; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; border: 2px solid #edf2f7; transition: 0.2s; }
+        .q-dot.answered { background: var(--p); color: white; border-color: var(--p); }
+        .q-dot.current { border-color: var(--p); border-width: 2px; color: var(--p); }
+        .q-dot.answered.current { color: white; }
+
+        #result-screen { display: none; text-align: center; padding-bottom: 50px; }
         .chart-container { width: 100%; max-width: 250px; margin: 0 auto; }
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
         .stat-box { padding: 15px; border-radius: 12px; background: #f7fafc; border: 1px solid #edf2f7; }
@@ -76,10 +90,11 @@ function generateHTML(data) {
         .correct-opt { background: #38a169; color: white; font-weight: bold; }
         .incorrect-opt { background: #e53e3e; color: white; }
         
-        /* Media Queries برای موبایل‌های خیلی کوچک */
-        @media (max-width: 400px) {
+        /* Media Queries برای موبایل */
+        @media (max-width: 600px) {
+            body { padding: 0; }
+            .quiz-card { margin-top: 0; border-radius: 0; min-height: 100vh; box-shadow: none; padding-bottom: 100px; }
             .q-text { font-size: 1.1rem; }
-            .quiz-card { padding: 15px; }
             .opt { padding: 12px; font-size: 0.9rem; }
         }
     </style>
@@ -92,8 +107,19 @@ function generateHTML(data) {
             <div class="q-text" id="q-content"></div>
             <div id="options-container"></div>
             <div class="nav-btns">
+                <button class="n-btn list-btn" onclick="toggleList()">☰</button>
                 <button class="n-btn" id="prevBtn" onclick="prevQ()">قبلی</button>
                 <button class="n-btn" id="nextBtn" onclick="nextQ()">بعدی</button>
+            </div>
+        </div>
+
+        <div id="list-modal" class="modal" onclick="if(event.target === this) toggleList()">
+            <div class="modal-content">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="margin: 0;">لیست سوالات</h3>
+                    <button class="n-btn list-btn" onclick="toggleList()">✕</button>
+                </div>
+                <div class="q-grid" id="q-grid"></div>
             </div>
         </div>
 
@@ -140,6 +166,27 @@ function generateHTML(data) {
         }
 
         function prevQ() { if (currentIdx > 0) { currentIdx--; showQuestion(); } }
+
+        function toggleList() {
+            const modal = document.getElementById('list-modal');
+            const isVisible = modal.style.display === 'flex';
+            modal.style.display = isVisible ? 'none' : 'flex';
+            if (!isVisible) renderGrid();
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('q-grid');
+            grid.innerHTML = '';
+            quizData.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.className = 'q-dot';
+                if (userAnswers[i] !== null) dot.classList.add('answered');
+                if (i === currentIdx) dot.classList.add('current');
+                dot.innerText = i + 1;
+                dot.onclick = () => { currentIdx = i; showQuestion(); toggleList(); };
+                grid.appendChild(dot);
+            });
+        }
 
         function showResults() {
             document.getElementById('quiz-screen').style.display = 'none';
