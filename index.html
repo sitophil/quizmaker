@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>سایتوفیل | طراحی سایت و توسعه وب حرفه‌ای | Sitophil</title>
+    <meta name="description" content="سایتوفیل (Sitophil) ارائه دهنده خدمات طراحی سایت مدرن، برنامه نویسی اختصاصی و سئو با استانداردهای جهانی. طراحی خاص برای برندهای خاص.">
+    <meta name="keywords" content="طراحی سایت, برنامه نویسی وب, سئو, سایتوفیل, Sitophil, طراحی سایت هکری, توسعه وب">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://sitophil.com">
+    <meta property="og:title" content="سایتوفیل | آینده وب">
+    <meta property="og:description" content="طراحی وبسایت‌های استاتیک و داینامیک با جلوه‌های ویژه سه بعدی.">
+    <meta property="og:type" content="website">
+
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #020202;
+            --terminal-green: #00ff41;
+            --accent-green: #0aff5d;
+            --dim-green: #003300;
+            --text-color: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Vazirmatn', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --- Scrollbar --- */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--dim-green); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--terminal-green); }
+
+        /* --- Background Effects --- */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.7; /* Enhanced visibility */
+        }
+
+        .matrix-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 60%, #000 150%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* --- Typography Helpers --- */
+        .tech-font { font-family: 'Share Tech Mono', monospace; }
+        .green-glow { text-shadow: 0 0 10px var(--terminal-green); color: var(--terminal-green); }
+        
+        /* --- Header / Hero --- */
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 10vw, 6rem);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        h1::after {
+            content: '_';
+            animation: blink 1s infinite;
+        }
+        h1::before {
+            content: '_';
+            animation: blink 1s infinite;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #888;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            font-size: 0.9rem;
+            color: var(--terminal-green);
+            opacity: 0.7;
+            animation: bounce 2s infinite;
+        }
+
+        /* --- Pinned Text Reveal Section --- */
+        .pinned-section {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .reveal-text-container {
+            width: 90%;
+            max-width: 1000px;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 800;
+            text-align: center;
+            line-height: 1.8;
+            perspective: 1000px; /* For 3D text effect */
+        }
+
+        .word {
+            display: inline-block;
+            margin: 0 6px;
+            opacity: 0; /* Hidden initially */
+            transform: translateY(30px) scale(0.8); /* Moved down and smaller */
+            filter: blur(10px); /* Blurred */
+            /* Transition handled by GSAP */
+        }
+
+        .word.active {
+            /* This class is conceptually what GSAP animates to */
+            color: var(--terminal-green);
+            text-shadow: 0 0 15px var(--terminal-green);
+        }
+
+        /* --- Services Section (SEO Rich) --- */
+        .services-section {
+            padding: 100px 20px;
+            background: linear-gradient(to bottom, transparent, rgba(0,20,0,0.5));
+            position: relative;
+            z-index: 2;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+            color: var(--terminal-green);
+            border-bottom: 1px solid var(--dim-green);
+            display: inline-block;
+            padding-bottom: 10px;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid var(--dim-green);
+            padding: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            border-color: var(--terminal-green);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 255, 65, 0.1);
+        }
+
+        .card i {
+            font-size: 2.5rem;
+            color: var(--terminal-green);
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .card p {
+            color: #aaa;
+            font-size: 0.95rem;
+        }
+
+        /* --- Why Us Section --- */
+        .why-us {
+            padding: 100px 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 50px;
+        }
+
+        .stat-item {
+            margin: 20px;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            color: var(--terminal-green);
+            font-family: 'Share Tech Mono', monospace;
+            display: block;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background: #000;
+            border-top: 1px solid var(--dim-green);
+            padding: 60px 20px;
+            text-align: center;
+            position: relative;
+            z-index: 5;
+        }
+
+        .cta-box {
+            margin-bottom: 40px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            border: 2px solid var(--terminal-green);
+            padding: 15px 50px;
+            font-size: 1.2rem;
+            color: var(--terminal-green);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: var(--terminal-green);
+            transition: 0.3s;
+            z-index: -1;
+        }
+
+        .cta-btn:hover::before {
+            left: 0;
+        }
+
+        .cta-btn:hover {
+            color: #000;
+            box-shadow: 0 0 30px var(--terminal-green);
+        }
+
+        .copy {
+            color: #444;
+            font-size: 0.8rem;
+            margin-top: 20px;
+        }
+
+        /* --- Animations --- */
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
+
+        /* --- Modal --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show {
+            display: block;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: #050505;
+            margin: 10% auto;
+            padding: 30px;
+            border: 1px solid var(--terminal-green);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 0 20px var(--dim-green);
+            transform: translateY(-50px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            color: var(--terminal-green);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label, .captcha-container label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--terminal-green);
+        }
+
+        .form-group input, .captcha-container input {
+            width: 100%;
+            padding: 10px;
+            background: #111;
+            border: 1px solid var(--dim-green);
+            color: var(--terminal-green);
+            font-family: inherit;
+        }
+
+        .form-group input:focus, .captcha-container input:focus {
+            outline: none;
+            border-color: var(--terminal-green);
+            box-shadow: 0 0 5px var(--terminal-green);
+        }
+
+        .captcha-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px dashed var(--dim-green);
+        }
+
+        #formStatus {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="matrix-overlay"></div>
+    <div id="canvas-container"></div>
+
+    <main>
+        <header>
+            <h1 class="tech-font green-glow">SITOPHIL</h1>
+            <p class="subtitle">معماری دیجیتال | سئو | توسعه وب</p>
+            <a href="javascript:void(0)" id="openContact" class="cta-btn tech-font" style="margin-top: 1.5rem; padding: 10px 30px; font-size: 1rem;">تماس با ما</a>
+            <div class="scroll-indicator tech-font">INITIALIZING SYSTEM... SCROLL DOWN</div>
+        </header>
+
+        <section class="pinned-section">
+            <div class="reveal-text-container" id="text-reveal">
+                در سایتوفیل، ما کدها را به هنر تبدیل می‌کنیم. وب‌سایت شما فقط یک آدرس اینترنتی نیست، بلکه هویت دیجیتال شماست. ما با استراتژی دقیق و طراحی جسورانه، شما را در صفحه اول گوگل و در ذهن مشتریانتان ماندگار می‌کنیم. سرعت بالا، امنیت مطلق و طراحی خیره‌کننده، استاندارد ماست.
+            </div>
+        </section>
+
+        <section class="services-section">
+           
+            <div class="grid-container">
+                <article class="card">
+                    <i class="fas fa-code"></i>
+                    <h3>توسعه اختصاصی وب</h3>
+                    <p>کدنویسی تمیز و بهینه (Clean Code) با جدیدترین تکنولوژی‌های روز دنیا برای سرعتی مافوق تصور.</p>
+                </article>
+                <article class="card">
+                    <i class="fas fa-search-dollar"></i>
+                    <h3>سئو تکنیکال (SEO)</h3>
+                    <p>بهینه‌سازی عمیق ساختار سایت برای موتورهای جستجو. ما زبان گوگل را بهتر از هر کسی می‌فهمیم.</p>
+                </article>
+                
+                <article class="card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>امنیت سایبری</h3>
+                    <p>پیاده‌سازی پروتکل‌های امنیتی پیشرفته برای حفاظت از داده‌های ارزشمند شما و مشتریانتان.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="why-us">
+            <p style="color: #bbb; margin-bottom: 30px;">چرا برندهای بزرگ به سایتوفیل اعتماد می‌کنند؟</p>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number count-up" data-target="100">0</span>%
+                    <span>رضایت مشتری</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number count-up" data-target="86">0</span>
+                    <span>پروژه موفق</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number count-up" data-target="24">0</span>/7
+                    <span>پشتیبانی</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="cta-box">
+            <h2 style="margin-bottom: 2rem; color: #fff;">پروژه بعدی شما، شاهکار بعدی ماست.</h2>
+            <a href="#" class="cta-btn tech-font" onclick="openTelegram(); return false;">START PROJECT_</a>
+        </div>
+        <div class="copy tech-font">
+            &copy; 2025 SITOPHIL. ALL RIGHTS RESERVED. <br> SYSTEM STATUS: ONLINE
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        // --- 1. Enhanced Three.js Scene (Particle Torus Knot) ---
+        const scene = new THREE.Scene();
+        // Fog for depth
+        scene.fog = new THREE.FogExp2(0x020202, 0.05);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Complex Geometry: Torus Knot
+        const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16);
+        
+        // Convert to Particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(geometry.attributes.position.array.length * 3);
+        
+        // Add some randomness to particles for a "glitchy/cloud" look
+        const originalPos = geometry.attributes.position.array;
+        for(let i = 0; i < originalPos.length; i++) {
+             // Expand the shape a bit
+             positions[i] = originalPos[i] * 1.5 + (Math.random() - 0.5) * 0.5;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(originalPos, 3));
+
+        const material = new THREE.PointsMaterial({
+            size: 0.12,
+            color: 0x00ff41,
+            transparent: true,
+            opacity: 1.0,
+            blending: THREE.AdditiveBlending
+        });
+
+        const particlesMesh = new THREE.Points(particlesGeometry, material);
+        scene.add(particlesMesh);
+
+        camera.position.z = 35;
+
+        // Animation Loop
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX - window.innerWidth / 2) * 0.001;
+            mouseY = (e.clientY - window.innerHeight / 2) * 0.001;
+        });
+
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+
+            targetX = mouseX * 2;
+            targetY = mouseY * 2;
+
+            // Smooth rotation following mouse
+            particlesMesh.rotation.y += 0.05 * (targetX - particlesMesh.rotation.y);
+            particlesMesh.rotation.x += 0.05 * (targetY - particlesMesh.rotation.x);
+
+            // Constant organic movement
+            particlesMesh.rotation.z += 0.002;
+            
+            // Pulse effect (scale)
+            const scale = 1 + Math.sin(elapsedTime * 2) * 0.05;
+            particlesMesh.scale.set(scale, scale, scale);
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- 2. Advanced GSAP Text Reveal ---
+        gsap.registerPlugin(ScrollTrigger);
+
+        const textContainer = document.getElementById('text-reveal');
+        const rawText = textContainer.innerText;
+        textContainer.innerHTML = ''; 
+
+        // Split text
+        const words = rawText.split(' ');
+        words.forEach(word => {
+            const span = document.createElement('span');
+            span.innerText = word + ' ';
+            span.classList.add('word');
+            textContainer.appendChild(span);
+        });
+
+        const wordElements = document.querySelectorAll('.word');
+
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: ".pinned-section",
+                start: "top top",
+                end: "+=300%", // Longer scroll for slower reading
+                scrub: 1,
+                pin: true,
+            }
+        });
+
+        // The "Cinematic" Reveal Animation
+        tl.to(wordElements, {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            filter: "blur(0px)",
+            color: "#00ff41",
+            textShadow: "0 0 10px #00ff41",
+            stagger: 0.2, // Smooth flow
+            duration: 1,
+            ease: "power2.out"
+        });
+
+        // --- 3. Number Counter Animation for 'Why Us' ---
+        gsap.utils.toArray('.count-up').forEach(el => {
+            gsap.to(el, {
+                innerText: el.getAttribute('data-target'),
+                duration: 2,
+                snap: { innerText: 1 },
+                scrollTrigger: {
+                    trigger: el,
+                    start: "top 80%",
+                    toggleActions: "play none none reverse"
+                }
+            });
+        });
+
+    </script>
+    <div id="contactModal" class="modal">
+        <div class="modal-content tech-font">
+            <span class="close-modal">&times;</span>
+            <h2 class="green-glow" style="margin-bottom: 20px;">SYSTEM_CONTACT_FORM</h2>
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="name">نام (NAME):</label>
+                    <input type="text" id="name" name="name" required placeholder="نام خود را وارد کنید">
+                </div>
+                <div class="form-group">
+                    <label for="phone">شماره تماس (PHONE):</label>
+                    <input type="tel" id="phone" name="phone" required placeholder="۰۹۱۲۳۴۵۶۷۸۹">
+                </div>
+                <div class="form-group">
+                    <label for="work">حوزه کاری (FIELD):</label>
+                    <input type="text" id="work" name="work" required placeholder="مثلا: طراحی سایت فروشگاهی">
+                </div>
+                <div class="captcha-container">
+                    <label id="captchaQuestion" for="captchaInput"></label>
+                    <input type="text" id="captchaInput" required placeholder="پاسخ را اینجا بنویسید">
+                </div>
+                <button type="submit" class="cta-btn" style="width: 100%;">SEND_MESSAGE</button>
+            </form>
+            <div id="formStatus"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- 4. Modal & Form Logic ---
+        const modal = document.getElementById('contactModal');
+        const openBtn = document.getElementById('openContact');
+        const closeBtn = document.querySelector('.close-modal');
+        const contactForm = document.getElementById('contactForm');
+        const formStatus = document.getElementById('formStatus');
+        const captchaQuestion = document.getElementById('captchaQuestion');
+        const captchaInput = document.getElementById('captchaInput');
+
+        const captchaQuestions = [
+            { q: "آیا شما یک ربات هستید که قصد تسخیر جهان را دارد؟ (بله/خیر)", a: "خیر" },
+            { q: "حاصل ۲ + ۲ چند می‌شود؟ (به حروف بنویسید)", a: "چهار" },
+            { q: "برای عبور از فایروال، نام سایت را به حروف بزرگ تایپ کنید", a: "SITOPHIL" },
+            { q: "کدام خوشمزه‌تر است؟ (پیتزا / کابل شبکه)", a: "پیتزا" }
+        ];
+
+        let currentCaptcha;
+
+        function generateCaptcha() {
+            currentCaptcha = captchaQuestions[Math.floor(Math.random() * captchaQuestions.length)];
+            captchaQuestion.innerText = currentCaptcha.q;
+            captchaInput.value = '';
+        }
+
+        openBtn.onclick = () => {
+            modal.classList.add('show');
+            generateCaptcha();
+        };
+
+        closeBtn.onclick = () => {
+            modal.classList.remove('show');
+        };
+
+        window.onclick = (event) => {
+            if (event.target == modal) {
+                modal.classList.remove('show');
+            }
+        };
+
+        contactForm.onsubmit = async (e) => {
+            e.preventDefault();
+            
+            if (captchaInput.value.trim() !== currentCaptcha.a) {
+                formStatus.innerText = "خطا: پاسخ امنیتی اشتباه است. شما مشکوک به ربات بودن هستید!";
+                formStatus.style.color = "red";
+                generateCaptcha();
+                return;
+            }
+
+            const workerUrl = 'YOUR_CLOUDFLARE_WORKER_URL';
+            if (workerUrl === 'YOUR_CLOUDFLARE_WORKER_URL') {
+                formStatus.innerText = "خطا: لطفاً ابتدا آدرس ورکر خود را در کد تنظیم کنید (راهنمای فایل CLOUDFLARE_WORKER_SETUP.md را بخوانید).";
+                formStatus.style.color = "orange";
+                return;
+            }
+
+            formStatus.innerText = "در حال ارسال پیام به سرور مرکزی...";
+            formStatus.style.color = "var(--terminal-green)";
+
+            const formData = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                work: document.getElementById('work').value
+            };
+
+            try {
+                const response = await fetch(workerUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    formStatus.innerText = "پیام شما با موفقیت در شبکه ثبت شد. بزودی تماس می‌گیریم.";
+                    contactForm.reset();
+                    setTimeout(() => modal.classList.remove('show'), 3000);
+                } else {
+                    const errorText = await response.text();
+                    throw new Error(errorText || "Server responded with an error");
+                }
+            } catch (err) {
+                console.error("Submission Error:", err);
+                formStatus.innerText = "خطا در برقراری ارتباط با فایروال. مطمئن شوید ورکر به درستی تنظیم شده است.";
+                formStatus.style.color = "red";
+            }
+        };
+
+function openTelegram() {
+    // لینک مستقیم (اولویت‌دار)
+    const tgLink = "tg://resolve?domain=abolfazllx";
+
+    // لینک fallback (در صورت نبود تلگرام)
+    const webLink = "https://t.me/abolfazllx";
+
+    // تلاش برای باز کردن تلگرام
+    const timeout = setTimeout(function () {
+        // اگر تلگرام باز نشد، می‌رود روی نسخه وب
+        window.location.href = webLink;
+    }, 500); // نیم ثانیه کافی است
+
+    // تلاش برای باز کردن تلگرام
+    window.location.href = tgLink;
+
+    // اگر موفق شد، زمان‌سنج پاک می‌شود
+    window.onblur = function () {
+        clearTimeout(timeout);
+    };
+}
+</script>
+</body>
+</html>
